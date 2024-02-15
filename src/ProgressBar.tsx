@@ -1,19 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   Easing,
-  View,
-  I18nManager,
-  ViewStyle,
-  StyleProp,
   LayoutChangeEvent,
+  StyleProp,
+  View,
+  ViewStyle,
 } from 'react-native';
+import Svg, { Rect } from 'react-native-svg';
 
-type AnimationConfigMap = {
-  timing: Animated.DecayAnimationConfig;
-  spring: Animated.SpringAnimationConfig;
-  decay: Animated.TimingAnimationConfig;
-};
+const INDETERMINATE_WIDTH_FACTOR = 0.3;
+const BAR_WIDTH_ZERO_POSITION =
+  INDETERMINATE_WIDTH_FACTOR / (1 + INDETERMINATE_WIDTH_FACTOR);
 
 interface ProgressBarProps {
   animated?: boolean;
@@ -23,43 +21,39 @@ interface ProgressBarProps {
   children?: React.ReactNode;
   color?: string;
   // @TODO progress bar 안에 컴포넌트 넣을 수 있게(title 이런 거)
-  // @TODO 안에 채워지는 Linecap 설정할 수 있게.
-  // @TODO width, height number인 게 맘에 안듦
+  lineCap?: 'square' | 'round';
   height?: number;
-  width?: number;
+  width?: number | `${number}%`;
   indeterminate?: boolean;
   indeterminateAnimationDuration?: number;
   onLayout?: (event: LayoutChangeEvent) => void;
   progress?: number;
-  style?: StyleProp<ViewStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
   unfilledColor?: string;
   useNativeDriver?: boolean;
   animationType?: 'decay' | 'timing' | 'spring';
-  animationConfig?: AnimationConfigMap['decay' | 'timing' | 'spring'];
+  animationConfig?: Animated.AnimationConfig;
 }
 
-const INDETERMINATE_WIDTH_FACTOR = 0.3;
-const BAR_WIDTH_ZERO_POSITION =
-  INDETERMINATE_WIDTH_FACTOR / (1 + INDETERMINATE_WIDTH_FACTOR);
-
-export const ProgressBar: React.FC<ProgressBarProps> = ({
+export const ProgressBar = ({
   animated = true,
   borderColor,
-  borderRadius = 4,
+  height = 6,
+  borderRadius = height / 2,
   borderWidth = 1,
   children,
   color = 'rgba(0, 122, 255, 1)',
-  height = 6,
   indeterminate = false,
   indeterminateAnimationDuration = 1000,
   onLayout,
   progress = 0,
-  style,
-  unfilledColor,
-  width = 150,
-  animationConfig = { bounciness: 0, useNativeDriver: false },
+  containerStyle,
+  unfilledColor = 'rgba(0,0,0,0)',
+  width = '100%',
+  animationConfig = { useNativeDriver: false },
   animationType = 'spring',
-}) => {
+  lineCap = 'round',
+}: ProgressBarProps) => {
   const [layoutWidth, setLayoutWidth] = useState(0);
   const progressValue = useRef(
     new Animated.Value(
@@ -92,15 +86,6 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     }
   }, [progress, indeterminate]);
 
-  const handleLayout = (event: LayoutChangeEvent) => {
-    if (!width) {
-      setLayoutWidth(event.nativeEvent.layout.width);
-    }
-    if (onLayout) {
-      onLayout(event);
-    }
-  };
-
   const animate = () => {
     animationValue.setValue(0);
     Animated.timing(animationValue, {
@@ -116,43 +101,52 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     });
   };
 
-  const innerWidth = Math.max(0, width || layoutWidth) - borderWidth * 2;
-  const containerStyle: ViewStyle = {
-    width,
-    borderWidth,
-    borderColor: borderColor || color,
-    borderRadius,
-    overflow: 'hidden',
-    backgroundColor: unfilledColor,
-  };
-  const progressStyle: ViewStyle | any = {
-    backgroundColor: color,
-    height,
-    transform: [
-      {
-        translateX: animationValue.interpolate({
-          inputRange: [0, 1],
-          outputRange: [innerWidth * -INDETERMINATE_WIDTH_FACTOR, innerWidth],
-        }),
-      },
-      {
-        translateX: progressValue.interpolate({
-          inputRange: [0, 1],
-          outputRange: [innerWidth / (I18nManager.isRTL ? 2 : -2), 0],
-        }),
-      },
-      {
-        scaleX: progressValue.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0.0001, 1],
-        }),
-      },
-    ],
+  const handleLayout = (event: LayoutChangeEvent) => {
+    const { width } = event.nativeEvent.layout;
+    setLayoutWidth(width); // 부모 컨테이너의 너비를 측정하여 상태 업데이트
+    onLayout?.(event);
   };
 
+  const actualWidth = (
+    typeof width === 'string' && width.endsWith('%')
+      ? (parseFloat(width) / 100) * layoutWidth
+      : width
+  ) as number;
+  const progressWidth = actualWidth * Math.min(Math.max(progress, 0), 1);
+
   return (
-    <View style={[containerStyle, style]} onLayout={handleLayout}>
-      <Animated.View style={progressStyle} />
+    <View
+      style={[
+        {
+          borderWidth,
+          borderColor: borderColor || color,
+          borderRadius,
+          overflow: 'hidden',
+          backgroundColor: unfilledColor,
+        },
+        containerStyle,
+      ]}
+      onLayout={handleLayout}
+    >
+      <Svg height={height} width={actualWidth - borderWidth * 2}>
+        {/* background */}
+        <Rect
+          x={borderWidth}
+          y={borderWidth}
+          width={actualWidth}
+          height={height}
+          fill={unfilledColor}
+        />
+        {/* progress */}
+        <Rect
+          x={borderWidth}
+          y={borderWidth}
+          width={progressWidth}
+          height={height}
+          fill={color}
+          rx={lineCap === 'round' ? height / 2 : undefined}
+        />
+      </Svg>
       {children}
     </View>
   );

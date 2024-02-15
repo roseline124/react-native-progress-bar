@@ -6,7 +6,9 @@
     "skipLibCheck": true,
     "declaration": true,
     "esModuleInterop": true,
-    "jsx": "react"
+    "moduleResolution": "Node",
+    "jsx": "react",
+    "lib": ["ES2015"]
   },
   "include": ["src"],
   "exclude": ["node_modules"]
