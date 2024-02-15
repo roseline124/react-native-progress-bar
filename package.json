@@ -9,7 +9,7 @@
   "scripts": {
     "build:cjs": "tsc -p tsconfig.cjs.json",
     "build:esm": "tsc -p tsconfig.esm.json",
-    "build": "pnpm run build:cjs && npm run build:esm",
+    "build": "pnpm build:cjs && pnpm build:esm",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "files": [
