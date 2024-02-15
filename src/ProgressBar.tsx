@@ -11,7 +11,6 @@ import Svg, { Rect } from 'react-native-svg';
 import { ProgressBarText, ProgressBarTextProps } from './ProgressBarText';
 
 const AnimatedRect = Animated.createAnimatedComponent(Rect);
-
 const INDETERMINATE_WIDTH_FACTOR = 0.3;
 
 export interface ProgressBarProps {
