@@ -15,13 +15,12 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node.js
+      - name: Setup Node.js and pnpm
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          cache: 'pnpm' # pnpm 캐시 사용을 활성화합니다.
-      - name: Install pnpm
-        run: npm install -g pnpm
+          cache: 'pnpm'
+          package-manager: 'pnpm'
       - name: Install Dependencies
         run: pnpm install
       - name: Build
