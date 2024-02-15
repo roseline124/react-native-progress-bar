@@ -1,6 +1,6 @@
 {
   "name": "@roseline124/react-native-progress-bar",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "lightweight react-native progress bar",
   "main": "./dist/commonjs/index.js",
   "module": "./dist/esm/index.js",
