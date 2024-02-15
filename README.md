@@ -4,7 +4,7 @@ Lightweight react-native progress bar using `react-native-svg`.
 
 ## Demo
 
-![](examples/demo.gif)
+![](example/demo.gif)
 
 ## Prerequisites
 
@@ -15,8 +15,8 @@ Lightweight react-native progress bar using `react-native-svg`.
 ## Installation
 
 ```
-$ npm install react-native-progress-bar
-$ yarn add react-native-progress-bar
+$ npm install @roseline124/react-native-progress-bar
+$ yarn add @roseline124/react-native-progress-bar
 ```
 
 ## Example

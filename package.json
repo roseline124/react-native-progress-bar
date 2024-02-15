@@ -1,5 +1,5 @@
 {
-  "name": "react-native-progress-bar",
+  "name": "@roseline124/react-native-progress-bar",
   "version": "1.0.0",
   "description": "lightweight react-native progress bar",
   "main": "./dist/commonjs/index.js",
@@ -18,7 +18,7 @@
     "android",
     "ios",
     "cpp",
-    "react-native-progress-bar.podspec",
+    "@roseline124/react-native-progress-bar.podspec",
     "!dist/example",
     "!**/__tests__"
   ],
@@ -70,5 +70,8 @@
   },
   "npm": {
     "publish": true
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
