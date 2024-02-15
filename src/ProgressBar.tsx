@@ -8,46 +8,47 @@ import {
   ViewStyle,
 } from 'react-native';
 import Svg, { Rect } from 'react-native-svg';
+import { ProgressBarText, ProgressBarTextProps } from './ProgressBarText';
+
+const AnimatedRect = Animated.createAnimatedComponent(Rect);
 
 const INDETERMINATE_WIDTH_FACTOR = 0.3;
-const BAR_WIDTH_ZERO_POSITION =
-  INDETERMINATE_WIDTH_FACTOR / (1 + INDETERMINATE_WIDTH_FACTOR);
 
-interface ProgressBarProps {
+export interface ProgressBarProps {
   animated?: boolean;
   borderColor?: string;
   borderRadius?: number;
   borderWidth?: number;
   children?: React.ReactNode;
   color?: string;
-  // @TODO progress bar 안에 컴포넌트 넣을 수 있게(title 이런 거)
   lineCap?: 'square' | 'round';
-  height?: number;
   width?: number | `${number}%`;
-  indeterminate?: boolean;
-  indeterminateAnimationDuration?: number;
-  onLayout?: (event: LayoutChangeEvent) => void;
+  height?: number;
+  loop?: boolean;
+  loopAnimationDuration?: number;
   progress?: number;
-  containerStyle?: StyleProp<ViewStyle>;
   unfilledColor?: string;
-  useNativeDriver?: boolean;
+  onLayout?: (event: LayoutChangeEvent) => void;
+  containerStyle?: StyleProp<ViewStyle>;
   animationType?: 'decay' | 'timing' | 'spring';
   animationConfig?: Animated.AnimationConfig;
+  textProps?: ProgressBarTextProps;
 }
 
 export const ProgressBar = ({
-  animated = true,
+  textProps,
   borderColor,
+  children,
+  onLayout,
+  containerStyle,
+  animated = true,
   height = 6,
   borderRadius = height / 2,
-  borderWidth = 1,
-  children,
+  borderWidth = 0,
   color = 'rgba(0, 122, 255, 1)',
-  indeterminate = false,
-  indeterminateAnimationDuration = 1000,
-  onLayout,
+  loop = false,
+  loopAnimationDuration = 1000,
   progress = 0,
-  containerStyle,
   unfilledColor = 'rgba(0,0,0,0)',
   width = '100%',
   animationConfig = { useNativeDriver: false },
@@ -56,46 +57,49 @@ export const ProgressBar = ({
 }: ProgressBarProps) => {
   const [layoutWidth, setLayoutWidth] = useState(0);
   const progressValue = useRef(
-    new Animated.Value(
-      indeterminate
-        ? INDETERMINATE_WIDTH_FACTOR
-        : Math.min(Math.max(progress, 0), 1)
-    )
+    new Animated.Value(Math.min(Math.max(progress, 0), 1))
   ).current;
   const animationValue = useRef(
-    new Animated.Value(BAR_WIDTH_ZERO_POSITION)
+    new Animated.Value(INDETERMINATE_WIDTH_FACTOR)
   ).current;
 
+  /**
+   * loop animation
+   */
   useEffect(() => {
-    if (indeterminate) {
+    if (loop) {
       animate();
     }
-  }, [indeterminate]);
+  }, []);
 
+  /**
+   * animate once
+   */
   useEffect(() => {
-    const toValue = indeterminate
-      ? INDETERMINATE_WIDTH_FACTOR
-      : Math.min(Math.max(progress, 0), 1);
+    if (loop) {
+      return;
+    }
+    const toValue = Math.min(Math.max(progress, 0), 1);
     if (animated) {
       Animated[animationType](progressValue, {
-        toValue,
+        toValue: Math.min(Math.max(progress, 0), 1),
         ...animationConfig,
       } as any).start();
     } else {
       progressValue.setValue(toValue);
     }
-  }, [progress, indeterminate]);
+  }, [progress, loop]);
 
   const animate = () => {
-    animationValue.setValue(0);
     Animated.timing(animationValue, {
       toValue: 1,
-      duration: indeterminateAnimationDuration,
+      duration: loopAnimationDuration,
       easing: Easing.linear,
       isInteraction: false,
       useNativeDriver: animationConfig?.useNativeDriver ?? false,
     }).start((endState) => {
       if (endState.finished) {
+        animationValue.setValue(0);
         animate();
       }
     });
@@ -112,7 +116,16 @@ export const ProgressBar = ({
       ? (parseFloat(width) / 100) * layoutWidth
       : width
   ) as number;
-  const progressWidth = actualWidth * Math.min(Math.max(progress, 0), 1);
+
+  // const progressWidth = actualWidth * Math.min(Math.max(progress, 0), 1);
+  const progressWidth = progressValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, actualWidth],
+  });
+  const animatedWidth = animationValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, actualWidth],
+  });
 
   return (
     <View
@@ -122,7 +135,7 @@ export const ProgressBar = ({
           borderColor: borderColor || color,
           borderRadius,
           overflow: 'hidden',
-          backgroundColor: unfilledColor,
+          backgroundColor: 'trasparent',
         },
         containerStyle,
       ]}
@@ -137,15 +150,27 @@ export const ProgressBar = ({
           height={height}
           fill={unfilledColor}
         />
-        {/* progress */}
-        <Rect
-          x={borderWidth}
-          y={borderWidth}
-          width={progressWidth}
-          height={height}
-          fill={color}
-          rx={lineCap === 'round' ? height / 2 : undefined}
-        />
+        {/* when indeterminate prop is true */}
+        {loop ? (
+          <AnimatedRect
+            x={borderWidth}
+            y={borderWidth}
+            width={animatedWidth}
+            height={height}
+            fill={color}
+            rx={lineCap === 'round' ? height / 2 : undefined}
+          />
+        ) : (
+          <AnimatedRect
+            x={borderWidth}
+            y={borderWidth}
+            width={progressWidth}
+            height={height}
+            fill={color}
+            rx={lineCap === 'round' ? height / 2 : undefined}
+          />
+        )}
+        {textProps && <ProgressBarText {...textProps} />}
       </Svg>
       {children}
     </View>

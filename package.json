@@ -19,7 +19,7 @@
     "ios",
     "cpp",
     "react-native-progress-bar.podspec",
-    "!dist/examples",
+    "!dist/example",
     "!**/__tests__"
   ],
   "keywords": [
