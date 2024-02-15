@@ -15,12 +15,12 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Node.js and pnpm
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          cache: 'pnpm'
-          package-manager: 'pnpm'
+      - name: Install pnpm
+        run: npm install -g pnpm
       - name: Install Dependencies
         run: pnpm install
       - name: Build
