@@ -1,0 +1,74 @@
+{
+  "name": "react-native-progress-bar",
+  "version": "1.0.0",
+  "description": "lightweight react-native progress bar",
+  "main": "./dist/commonjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/commonjs/index.d.ts",
+  "source": "src/index",
+  "scripts": {
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build": "pnpm run build:cjs && npm run build:esm",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "src",
+    "dist",
+    "android",
+    "ios",
+    "cpp",
+    "react-native-progress-bar.podspec",
+    "!dist/examples",
+    "!**/__tests__"
+  ],
+  "keywords": [
+    "react-native",
+    "react-component",
+    "react-native-component",
+    "react",
+    "mobile",
+    "ios",
+    "ui",
+    "progress",
+    "progressindicator",
+    "bar",
+    "progressbar",
+    "spinner",
+    "animation"
+  ],
+  "author": {
+    "name": "Roseline",
+    "email": "guseod24@gmail.com"
+  },
+  "homepage": "https://github.com/roseline124/react-native-progress-bar",
+  "bugs": {
+    "url": "https://github.com/roseline124/react-native-progress-bar/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/roseline124/react-native-progress-bar.git"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@react-native-community/eslint-config": "^3.2.0",
+    "@types/react": "^16.9.19",
+    "@types/react-native": "0.62.7",
+    "react": "~16.9.0",
+    "react-native": "~0.61.5",
+    "react-native-svg": "^14.1.0",
+    "typescript": "^5.3.3"
+  },
+  "eslintIgnore": [
+    "node_modules/",
+    "dist/"
+  ],
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-svg": "^14.1.0"
+  },
+  "npm": {
+    "publish": true
+  }
+}
