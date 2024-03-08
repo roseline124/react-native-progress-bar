@@ -87,6 +87,10 @@ export const ProgressBar = ({
     } else {
       progressValue.setValue(toValue);
     }
+    return () => {
+      // initialize value when unmounted
+      progressValue.setValue(0);
+    };
   }, [progress, loop]);
 
   const animate = () => {

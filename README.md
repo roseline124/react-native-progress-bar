@@ -68,9 +68,10 @@ import { ProgressBar } from 'react-native-progress-bar'
 
 ## Test in local
 
-1. `pnpm pack`
-2. pnpm install `{relative_path}/react-native-progress-bar-1.x.x.tgz`
-3. test the library
+1. `pnpm build`
+2. `pnpm pack`
+3. pnpm install `{relative_path}/react-native-progress-bar-1.x.x.tgz`
+4. test the library
 
 I can't found the way to link the local library to example project.
 The `pnpm link` is not working. If you know the best way to deal with this issue, please let me know!
